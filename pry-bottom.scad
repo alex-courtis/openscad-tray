@@ -2,8 +2,8 @@ include <tray.scad>
 
 z = 20;
 
-t_outer = t_outer;
-t_inner = t_inner;
+t_outer = 1.6;
+t_inner = 1.2;
 
 y = 255;
 x = 162.5;
