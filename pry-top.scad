@@ -4,6 +4,8 @@ z = 15;
 
 t_outer = 1.6;
 t_inner = 1.2;
+t_bottom = 1.2 - t_outer + t_inner; // t_outer - t_inner is added
+echo(t_bottom=t_bottom);
 
 x_back = 162.5;
 y_back = 190;
@@ -17,7 +19,7 @@ render() {
     n_columns=6,
     thickness=t_outer,
     curved=true,
-    bottom_thickness=t_inner,
+    bottom_thickness=t_bottom,
     dividers_height=20,
     dividers_thickness=t_inner,
     bottom_bevel_radius=t_inner * 3,
@@ -32,7 +34,7 @@ render() {
         n_columns=3,
         thickness=t_outer,
         curved=true,
-        bottom_thickness=t_inner,
+        bottom_thickness=t_bottom,
         dividers_height=20,
         dividers_thickness=t_inner,
         bottom_bevel_radius=t_inner * 3,
