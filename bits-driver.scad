@@ -2,7 +2,7 @@ include <tray.scad>
 
 x = 255;
 y = 162.5;
-z = 12;
+z = 15;
 
 t_outer = 1.6;
 t_inner = 1.2;
