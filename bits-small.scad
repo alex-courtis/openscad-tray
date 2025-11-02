@@ -1,16 +1,16 @@
 include <tray.scad>
 
 render_numbers = true;
-render_tray = false;
+render_tray = true;
 
 t_outer = 1.6;
 t_inner = 1.2;
 t_bottom = 1.2 - t_outer + t_inner; // t_outer - t_inner is added
 echo(t_bottom=t_bottom);
 
-x = 174.5;
+x = 172.4;
 y = 162.5;
-z = 10;
+z = 9.8;
 
 y_numbers = 8.5;
 
@@ -33,23 +33,26 @@ echo(y_numbers=y_numbers);
 echo(z=z);
 
 row_min = 31;
-row_max = 68;
+row_max = 72;
 row_delta = row_max - row_min;
 rows = [
-  [(row_min + row_delta * 9 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 8 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 7 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 6 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 5 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 4 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 3 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 2 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 1 / 9) / y_bottom_inner],
-  [(row_min + row_delta * 0 / 9) / y_bottom_inner],
+  [(row_min + row_delta * 10 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 9 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 8 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 7 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 6 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 5 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 4 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 3 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 2 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 1 / 10) / y_bottom_inner],
+  [(row_min + row_delta * 0 / 10) / y_bottom_inner],
+  false,
 ];
 echo(rows=rows);
 
 text_left = [
+  "",
   "3  ",
   "2.5",
   "2  ",
@@ -58,6 +61,7 @@ text_left = [
 ];
 
 text_right = [
+  "",
   "3.2",
   "3.5",
   "4",
@@ -75,8 +79,8 @@ if (render_tray) {
     translate(v=[0, y_numbers, 0]) {
       tray(
         dimensions=[x, y_bottom, z],
-        n_columns=10,
-        n_rows=2,
+        n_columns=len(rows),
+        n_rows=[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
         rows=rows,
         thickness=t_outer,
         bottom_thickness=t_bottom,
@@ -100,9 +104,9 @@ if (render_numbers) {
     for (i = [0:len(text_left) - 1]) {
       translate(
         v=[
-          t_outer / 2 + (x - t_outer) * (i + 0.5) / 10,
+          t_outer / 2 + (x - t_outer) * (i + 0.5) / len(rows),
           t_inner / 3,
-          z - text_depth + 0.0001, // epsilon for nicer slicer rendering
+          z - text_depth + 0.005, // epsilon for nicer slicer rendering
         ]
       ) {
         linear_extrude(height=text_depth, center=false) {
@@ -123,9 +127,9 @@ if (render_numbers) {
     for (i = [0:len(text_right) - 1]) {
       translate(
         v=[
-          t_outer / 2 + (x - t_outer) * (i + 0.5) / 10,
+          t_outer / 2 + (x - t_outer) * (i + 0.5) / len(rows),
           y - y_numbers - t_inner,
-          z - text_depth,
+          z - text_depth + 0.005, // epsilon for nicer slicer rendering
         ]
       ) {
         linear_extrude(height=text_depth, center=false) {
