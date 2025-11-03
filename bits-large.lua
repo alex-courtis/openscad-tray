@@ -13,17 +13,16 @@ local bottom = {
 local padding_bottom = 6.5;
 
 local top = {
-  20,
-  12,
-  12,
-  20,
-  15,
-  15,
-  12,
-  12,
-  12,
+  20 + 5, -- conical large
+  12 + 5, -- conical small
+  12 + 5, -- conical small
+  19 + 2, -- tubing bit
+  14 + 3, -- deburring
+  15 + 2, -- large countersink
+  17, -- small
+  17, -- small
 }
-local padding_top = 3;
+local padding_top = 0;
 
 local function render(t, padding, part, dimension)
   print(part .. "=[")
