@@ -2,7 +2,6 @@ include <tray.scad>
 
 render_numbers = true;
 render_tray = true;
-render_plugs = false;
 
 t_outer = 1.2;
 t_inner = 1.2;
@@ -20,9 +19,6 @@ font = "Inter:style=Bold";
 text_pt = 17;
 text_size = text_pt / 3.937;
 text_depth = 0.6;
-
-plug_scale = 0.925;
-plug_depth = 14;
 
 // bits-large.lua
 bottom = [
@@ -92,58 +88,44 @@ echo(z_bottom=z_bottom);
 echo(z_top=z_top);
 
 render() {
-  if (render_tray || render_plugs) {
-    if (!render_plugs) {
-      color(c="gray") {
+  if (render_tray) {
+    color(c="gray") {
+      tray(
+        dimensions=[x_bottom, y_bottom, z_bottom],
+        n_columns=len(bottom),
+        columns=columns,
+        thickness=t_outer,
+        bottom_thickness=t_bottom,
+        dividers_thickness=t_inner,
+        bottom_bevel_radius=t_inner * 3,
+        top_bevel_radius=t_inner * 3,
+      );
+    }
+
+    color(c="lightgray") {
+      translate(v=[0, y_bottom - t_outer, 0]) {
+        cube([x_bottom, y_numbers + t_outer, z_bottom]);
+      }
+    }
+
+    color(c="darkgray") {
+      translate(v=[x_bottom - t_outer, 0, 0]) {
         tray(
-          dimensions=[x_bottom, y_bottom, z_bottom],
-          n_columns=len(bottom),
-          columns=columns,
+          dimensions=[x_top, y, z_top],
+          n_columns=1,
+          n_rows=len(top),
+          rows=[rows],
           thickness=t_outer,
           bottom_thickness=t_bottom,
           dividers_thickness=t_inner,
-          bottom_bevel_radius=t_inner * 3,
-          top_bevel_radius=t_inner * 3,
+          bottom_bevel_radius=t_inner * 6,
+          top_bevel_radius=t_inner * 6,
         );
-      }
-    }
-
-    if (!render_plugs) {
-      color(c="lightgray") {
-        translate(v=[0, y_bottom - t_outer, 0]) {
-          cube([x_bottom, y_numbers + t_outer, z_bottom]);
-        }
-      }
-    }
-
-    scale(render_plugs ? plug_scale : 1) {
-      translate(v=[x_bottom - t_outer, 0, 0]) {
-        difference() {
-          if (render_plugs) {
-            color(c="red") {
-              cube([x_top, y, z_top - plug_depth]);
-            }
-          }
-
-          color(c="darkgray") {
-            tray(
-              dimensions=[x_top, y, z_top],
-              n_columns=1,
-              n_rows=len(top),
-              rows=[rows],
-              thickness=t_outer,
-              bottom_thickness=t_bottom,
-              dividers_thickness=t_inner,
-              bottom_bevel_radius=t_inner * 6,
-              top_bevel_radius=t_inner * 6,
-            );
-          }
-        }
       }
     }
   }
 
-  if (render_numbers && !render_plugs) {
+  if (render_numbers) {
     color(c="black") {
       for (i = [0:len(columns)]) {
         translate(
