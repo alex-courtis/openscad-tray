@@ -15,10 +15,13 @@ z_top = 25.6;
 
 y_numbers = 8.5;
 
-font = "Inter:style=Bold";
-text_pt = 17;
+font = "Inter:style=Black";
+text_pt = 18;
+text_pt_dec = 15;
 text_size = text_pt / 3.937;
+text_size_dec = text_pt_dec / 3.937;
 text_depth = 0.6;
+text_dy = -0.75;
 
 // bits-large.lua
 bottom = [
@@ -118,8 +121,8 @@ render() {
           thickness=t_outer,
           bottom_thickness=t_bottom,
           dividers_thickness=t_inner,
-          bottom_bevel_radius=t_inner * 6,
-          top_bevel_radius=t_inner * 6,
+          bottom_bevel_radius=t_inner * 10.0,
+          top_bevel_radius=t_inner * 7,
         );
       }
     }
@@ -131,13 +134,14 @@ render() {
         translate(
           v=[
             t_outer + (x_bottom - t_outer) * (columns[i] ? columns[i] : 1) - (bottom[i] + padding_bottom) / 2 - t_inner,
-            y_bottom - t_inner,
+            y_bottom + text_dy,
             z_bottom - text_depth + 0.0001, // epsilon for nicer slicer rendering
           ]
         ) {
           linear_extrude(height=text_depth, center=false) {
             rotate(a=90, v=[0, 0, 1]) {
-              text(font=font, size=text_size, text=str(bottom[i]), halign="left", valign="center");
+			size = floor(bottom[i]) == bottom[i] ? text_size : text_size_dec;
+              text(font=font, size=size, text=str(bottom[i]), halign="left", valign="center");
             }
           }
         }
