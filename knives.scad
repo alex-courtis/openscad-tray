@@ -2,7 +2,7 @@ include <tray.scad>
 
 t_outer = 1.6;
 t_inner = 1.2;
-t_bottom = 1.2 - t_outer + t_inner; // t_outer - t_inner is added
+t_bottom = 1.6 - t_outer + t_inner; // t_outer - t_inner is added
 echo(t_bottom=t_bottom);
 
 x = 162.5;
