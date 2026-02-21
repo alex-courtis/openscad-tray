@@ -48,19 +48,21 @@ text_depth = 0.6;
 text_dy = -0.75;
 
 // sides of case and tray
-g_case_side = 0.4;
+g_case_side = 0.3;
 
 // bottom of case and tray
-g_case_bottom = 0.6;
+g_case_bottom = 0.3;
 
 // top of case and tray
-g_case_top = 0.8;
+g_case_top = 0.3;
 
 l_tail_ratio = 0.6;
 
 w_tail = 30;
 w_socket = z_top / 2 + g_case_top + g_case_bottom;
 t_case = 4.8;
+t_case_bottom = 1.2;
+t_case_top = 1.2;
 l_tail = w_socket * l_tail_ratio;
 
 // tails each side
@@ -139,6 +141,7 @@ module case_x_side() {
   echo(x_socket=x_socket);
 
   l12_socket = (x_socket - w_tail) / 2;
+  echo(l12_socket=l12_socket);
 
   translate(v=[x_socket / 2, 0, 0]) {
 
@@ -150,6 +153,8 @@ module case_x_side() {
               dove_tail(
                 l=w_socket,
                 w=w_tail,
+                w1=l12_socket,
+                w2=l12_socket,
                 t=t_case,
                 l_tail=l_tail,
                 l1=z_top / 2,
@@ -172,7 +177,7 @@ module case_x_side() {
 }
 
 module case_x_sides() {
-  translate(v=[0, 0, w_socket / 2 - g_case_bottom]) {
+  translate(v=[-g_case_side, 0, w_socket / 2 - g_case_bottom]) {
     dy = t_case / 2 + g_case_side;
     translate(v=[0, -dy, 0]) {
       case_x_side();
@@ -184,9 +189,43 @@ module case_x_sides() {
   }
 }
 
+module case_bottom() {
+  x = x;
+  y = y + 2 * (t_case + g_case_side);
+  z = t_case_bottom;
+
+  translate(
+    v=[
+      x / 2 - g_case_side,
+      y / 2 - t_case - g_case_side,
+      -z / 2 - g_case_bottom + 0.001,
+    ]
+  )
+    cube([x, y, z], center=true);
+}
+
+module case_top() {
+  x = x;
+  y = y + 2 * (t_case + g_case_side);
+  z = t_case_top;
+
+  translate(
+    v=[
+      x / 2 - g_case_side,
+      y / 2 - t_case - g_case_side,
+      z / 2 + z_top + g_case_top,
+    ]
+  )
+    cube([x, y, z], center=true);
+}
+
 render() {
   if (render_case) {
     case_x_sides();
+    color(c="lightblue")
+      case_bottom();
+    color(c="steelblue")
+      case_top();
   }
 
   if (render_tray) {
