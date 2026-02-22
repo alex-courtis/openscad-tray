@@ -1,31 +1,33 @@
 include <tray.scad>
-include <../scad-models/lib/joints.scad>
+include <BOSL2/std.scad>
+include <BOSL2/hinges.scad>
 
 /* [Debug] */
 
-// joint waste
-debug_waste_layers = false;
-
-// joint h and v edge lines
-debug_waste_lines = false;
-
-// large gaps, edges and dowels
-grd_debug = false;
-
-// large gaps
-g_debug = 1; // [0:0.1:5]
-
-// large edges
-r_edge_debug = 0.5; // [0:0.1:5]
-
-// large dowels
-d_dowel_debug = 2; // [0:0.1:5]
-
-render_numbers = true;
-render_tray = true;
+render_numbers = false;
+render_tray = false;
 render_case = true;
 
-/* [Dimensions] */
+/* [Case] */
+
+g_case_x = 0.2; // [0:0.1:5]
+g_case_y = 0.2; // [0:0.1:5]
+g_case_z = 0.2; // [0:0.1:5]
+g_case_half = 0.2; // [0:0.1:5]
+
+t_case_x = 2; // [0:0.1:5]
+t_case_y = 2; // [0:0.1:5]
+t_case_z = 0.8; // [0:0.1:5]
+
+d_pin = 3.05; // [0:0.01:10]
+l_hinge = 40; // [1:0.1:10]
+
+// added to d_pin
+hinge_offset = 2; // [0:0.01:5]
+
+hinge_segs = 7; // [2:0.01:20]
+
+/* [Tray] */
 
 t_outer = 1.2;
 t_inner = 1.2;
@@ -46,27 +48,6 @@ text_size = text_pt / 3.937;
 text_size_dec = text_pt_dec / 3.937;
 text_depth = 0.6;
 text_dy = -0.75;
-
-// sides of case and tray
-g_case_side = 0.3;
-
-// bottom of case and tray
-g_case_bottom = 0.3;
-
-// top of case and tray
-g_case_top = 0.3;
-
-l_tail_ratio = 0.6;
-
-w_tail = 30;
-w_socket = z_top / 2 + g_case_top + g_case_bottom;
-t_case = 4.8;
-t_case_bottom = 1.2;
-t_case_top = 1.2;
-l_tail = w_socket * l_tail_ratio;
-
-// tails each side
-n_tails = 5;
 
 // bits-large.lua
 bottom = [
@@ -135,97 +116,79 @@ echo("delta", y_top_calc - y);
 echo(z_bottom=z_bottom);
 echo(z_top=z_top);
 
-module case_x_side() {
+module case_hinge(inner, teardrop) {
+  rotate(a=90, v=[1, 0, 0])
+    knuckle_hinge(
+      length=l_hinge,
+      segs=hinge_segs,
+      offset=d_pin + hinge_offset,
+      arm_height=0,
+      knuckle_diam=d_pin * 2,
+      pin_diam=d_pin,
+      arm_angle=45,
+      clear_top=false,
+      fill=false,
+      inner=inner,
+      teardrop=teardrop,
+    );
+}
 
-  x_socket = x / n_tails;
-  echo(x_socket=x_socket);
+module case_hinges(dy) {
+  translate(v=[0, dy, 0]) {
+    rotate(a=90, v=[0, 0, -1])
+      case_hinge(inner=false);
+    mirror(v=[0, 0, 1])
+      rotate(a=90, v=[0, 0, -1])
+        case_hinge(inner=true);
+  }
 
-  l12_socket = (x_socket - w_tail) / 2;
-  echo(l12_socket=l12_socket);
-
-  translate(v=[x_socket / 2, 0, 0]) {
-
-    for (i = [0:1:n_tails - 1]) {
-      translate(v=[i * x_socket, 0, 0]) {
-        rotate(a=90, v=[0, 0, -1])
-          rotate(a=90, v=[0, 1, 0])
-            color(COL[i][1])
-              dove_tail(
-                l=w_socket,
-                w=w_tail,
-                w1=l12_socket,
-                w2=l12_socket,
-                t=t_case,
-                l_tail=l_tail,
-                l1=z_top / 2,
-              );
-
-        rotate(a=90, v=[-1, 0, 0])
-          color(COL[i][0])
-            dove_socket(
-              l=w_tail,
-              w=w_socket,
-              t=t_case,
-              l_tail=l_tail,
-              l1=l12_socket,
-              l2=l12_socket,
-              inner=true,
-            );
-      }
-    }
+  translate(v=[0, -dy, 0]) {
+    rotate(a=90, v=[0, 0, -1])
+      case_hinge(inner=false, teardrop=UP);
+    mirror(v=[0, 0, 1])
+      rotate(a=90, v=[0, 0, -1])
+        case_hinge(inner=true, teardrop=UP);
   }
 }
 
-module case_x_sides() {
-  translate(v=[-g_case_side, 0, w_socket / 2 - g_case_bottom]) {
-    dy = t_case / 2 + g_case_side;
-    translate(v=[0, -dy, 0]) {
-      case_x_side();
-    }
-    translate(v=[0, y + dy, 0]) {
-      mirror(v=[0, 1, 0])
-        case_x_side();
-    }
+module case() {
+  inner = [
+    x + g_case_x * 2,
+    y + g_case_y * 2,
+    z_top + g_case_z * 2,
+  ];
+  echo(inner=inner);
+
+  outer = inner + 2 * [t_case_x, t_case_y, t_case_z];
+  echo(outer=outer);
+
+  // TODO remove * 2 after test print
+  front = [x_top * 2 + t_case_x + g_case_x, outer[1], outer[2]];
+  echo(front=front);
+
+  middle = [outer[0], outer[1], g_case_half];
+  echo(middle=middle);
+
+  // shell with front chopped off
+  difference() {
+    cube(outer, center=true);
+    cube(inner, center=true);
+
+    cube(middle, center=true);
+
+    translate(v=[( -front[0] + outer[0]) / 2, 0, 0])
+      cube(front, center=true);
   }
-}
 
-module case_bottom() {
-  x = x;
-  y = y + 2 * (t_case + g_case_side);
-  z = t_case_bottom;
-
-  translate(
-    v=[
-      x / 2 - g_case_side,
-      y / 2 - t_case - g_case_side,
-      -z / 2 - g_case_bottom + 0.001,
-    ]
-  )
-    cube([x, y, z], center=true);
-}
-
-module case_top() {
-  x = x;
-  y = y + 2 * (t_case + g_case_side);
-  z = t_case_top;
-
-  translate(
-    v=[
-      x / 2 - g_case_side,
-      y / 2 - t_case - g_case_side,
-      z / 2 + z_top + g_case_top,
-    ]
-  )
-    cube([x, y, z], center=true);
+  translate(v=[-outer[0] / 2, 0, 0]) {
+    case_hinges(dy=outer[1] / 2 - l_hinge / 2);
+  }
 }
 
 render() {
   if (render_case) {
-    case_x_sides();
-    color(c="lightblue")
-      case_bottom();
-    color(c="steelblue")
-      case_top();
+    translate(v=[x / 2, y / 2, z_top / 2])
+      case();
   }
 
   if (render_tray) {
