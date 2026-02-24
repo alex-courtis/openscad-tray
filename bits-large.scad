@@ -19,6 +19,13 @@ split_ratio = 0.75; // [0:0.001:1]
 // 1 for auto: x_top / 4
 case_cutoff_dx = -20; // [-200:1:1]
 
+d_pin = 3.10; // [0:0.01:10]
+d_knuckle = 7; // [0:0.01:15]
+l_hinge = 40; // [1:0.1:10]
+g_hinge = 0.2; // [0:0.001:1]
+offset_hinge = 0.2; // [0:0.01:5]
+segs_hinge = 7; // [2:0.01:20]
+
 g_case_x = 0.2; // [0:0.1:5]
 g_case_y = 0.2; // [0:0.1:5]
 g_case_z = 0.2; // [0:0.1:5]
@@ -27,15 +34,6 @@ g_case_half = 0.2; // [0:0.1:5]
 t_case_x = 2.4; // [0:0.1:5]
 t_case_y = 2.4; // [0:0.1:5]
 t_case_z = 1.2; // [0:0.1:5]
-
-d_pin = 3.10; // [0:0.01:10]
-d_knuckle = 7; // [0:0.01:15]
-l_hinge = 40; // [1:0.1:10]
-
-// added to d_pin
-hinge_offset = 0.2; // [0:0.01:5]
-
-hinge_segs = 7; // [2:0.01:20]
 
 /* [Tray] */
 
@@ -137,49 +135,62 @@ dx_case_front = case_cutoff_dx < 1 ? case_cutoff_dx : -x_top / 4;
 echo(dx_case_front=dx_case_front);
 
 // manually cutoff arms as rounded arm bottoms do not print well
-module case_hinge(inner) {
-  color(c=inner ? "gray" : "steelblue") {
-    intersection() {
-      rotate(a=90, v=[1, 0, 0])
-        knuckle_hinge(
-          length=l_hinge,
-          segs=hinge_segs,
-          offset=d_knuckle / 2 + hinge_offset,
-          arm_height=case_z,
-          knuckle_diam=d_knuckle,
-          pin_diam=d_pin,
-          arm_angle=90,
-          clear_top=false,
-          fill=true,
-          inner=inner,
-          teardrop=UP,
-        );
+module case_hinge(inner, gap = g_hinge) {
+  intersection() {
+    rotate(a=90, v=[1, 0, 0])
+      knuckle_hinge(
+        length=l_hinge,
+        segs=segs_hinge,
+        offset=d_knuckle / 2 + offset_hinge,
+        arm_height=case_z,
+        knuckle_diam=d_knuckle,
+        pin_diam=d_pin,
+        arm_angle=90,
+        clear_top=false,
+        fill=true,
+        inner=inner,
+        teardrop=UP,
+        gap=gap,
+      );
 
-      cube([l_hinge, 2 * (d_knuckle + hinge_offset), case_z], center=true);
-    }
+    cube([l_hinge, 2 * (d_knuckle + offset_hinge), case_z], center=true);
   }
 }
 
-module case_hinges(dy, top) {
+module case_hinges(top) {
 
-  translate(v=[0, dy, 0]) {
-    if (top)
-      mirror(v=[0, 0, 1])
-        rotate(a=90, v=[0, 0, -1])
-          case_hinge(inner=top);
-    else
+  dx = -case_x / 2;
+  dy = case_y / 2 - l_hinge / 2;
+
+  translate(v=[dx, dy, 0]) {
+    mirror(v=[0, 0, top ? 1 : 0])
       rotate(a=90, v=[0, 0, -1])
         case_hinge(inner=top);
   }
 
-  translate(v=[0, -dy, 0]) {
-    if (top)
-      mirror(v=[0, 0, 1])
-        rotate(a=90, v=[0, 0, -1])
-          case_hinge(inner=top);
-    else
+  translate(v=[dx, -dy, 0]) {
+    mirror(v=[0, 0, top ? 1 : 0])
       rotate(a=90, v=[0, 0, -1])
         case_hinge(inner=top);
+  }
+}
+
+module case_hinge_inner_cutout() {
+
+  dx = (d_knuckle + t_case_x - case_x) / 2;
+  dy = case_y / 2 - l_hinge / 2;
+  dz = case_z / 2;
+
+  translate(v=[dx, dy, dz]) {
+    hull()
+      rotate(a=90, v=[0, 0, -1])
+        case_hinge(inner=true, gap=0);
+  }
+
+  translate(v=[dx, -dy, dz]) {
+    hull()
+      rotate(a=90, v=[0, 0, -1])
+        case_hinge(inner=true, gap=0);
   }
 }
 
@@ -202,22 +213,25 @@ module case_shell(top) {
 
     translate(v=[case_x + dx_case_front, 0, 0])
       cube(outer, center=true);
+
+    if (!top)
+      case_hinge_inner_cutout();
   }
 
-  translate(v=[-case_x / 2, 0, 0]) {
-    case_hinges(dy=case_y / 2 - l_hinge / 2, top=top);
-  }
+  case_hinges(top=top);
 }
 
 render() {
   translate(v=[x / 2, y / 2, z_top / 2]) {
     if (render_case_bottom)
       translate(v=[0, 0, explode_case_bottom_z])
-        case_shell(top=false);
+        color(c="skyblue")
+          case_shell(top=false);
 
     if (render_case_top)
       translate(v=[0, 0, explode_case_top_z])
-        case_shell(top=true);
+        color(c="lightsteelblue")
+          case_shell(top=true);
   }
 
   if (render_tray) {
