@@ -35,6 +35,10 @@ t_case_x = 2.4; // [0:0.1:5]
 t_case_y = 2.4; // [0:0.1:5]
 t_case_z = 1.2; // [0:0.1:5]
 
+// length of a segment
+snap_len = 24; // [1:1:50]
+snap_diam = 6; // [1:0.1:50]
+
 /* [Tray] */
 
 t_outer = 1.2;
@@ -194,8 +198,56 @@ module case_hinge_inner_cutout() {
   }
 }
 
+module case_snaps(top, left, z) {
+  y_snap = snap_diam;
+  z_snap = snap_diam / 2 + z;
+
+  snap_thick = z_snap - y_snap;
+
+  dx_snap = -snap_len * 3 / 2;
+
+  // rendered in opposite y by snap_thick
+  dy_snap =
+  (
+    top ?
+      snap_thick
+    : -snap_thick
+  ) + (
+    left ?
+      -(case_y + y_snap) / 2
+    : (case_y + y_snap) / 2
+  );
+
+  dz_snap = (top ? case_z / 2 : -case_z / 2);
+
+  translate(
+    v=[
+      dx_snap,
+      dy_snap,
+      dz_snap,
+    ]
+  ) if (!top)
+    snap_lock(
+      snapdiam=snap_diam,
+      thick=snap_thick,
+      snaplen=snap_len,
+      layerheight=0,
+      anchor=top ? FRONT : BACK,
+      orient=UP,
+    );
+  else
+    snap_socket(
+      snapdiam=snap_diam,
+      thick=snap_thick,
+      snaplen=snap_len,
+      layerheight=0,
+      anchor=top ? FRONT : BACK,
+      orient=DOWN,
+    );
+}
+
 // half shell with front chopped off
-module case_shell(top) {
+module case(top) {
   outer = [case_x, case_y, case_z];
   inner = outer - 2 * [t_case_x, t_case_y, t_case_z];
 
@@ -204,29 +256,51 @@ module case_shell(top) {
       case_z * (split_ratio - 1) + g_case_half / 2
     : case_z * (split_ratio) - g_case_half / 2;
 
+  z_half = abs(dz_half) + g_case_half / 2;
+
   difference() {
     union() {
-      difference() {
 
-        // shell
-        cube(outer, center=true);
-        cube(inner, center=true);
+      color(c=top ? "lightsteelblue" : "skyblue") {
+        difference() {
 
-        // split in half
-        translate(v=[0, 0, dz_half])
+          // shell
           cube(outer, center=true);
+          cube(inner, center=true);
 
-        // cut off front
-        translate(v=[case_x + dx_case_front, 0, 0])
-          cube(outer, center=true);
+          // split in half
+          translate(v=[0, 0, dz_half])
+            cube(outer, center=true);
 
-        // cutouts for inner hinges
-        if (!top)
-          case_hinge_inner_cutout();
+          // cut off front
+          translate(v=[case_x + dx_case_front, 0, 0])
+            cube(outer, center=true);
+
+          // cutouts for inner hinges
+          if (!top)
+            case_hinge_inner_cutout();
+        }
       }
 
-      // hinges
-      case_hinges(top=top);
+      color(c=top ? "steelblue" : "slateblue") {
+
+        // hinges
+        case_hinges(top=top);
+
+        // snaps
+        translate(v=[case_x / 2 + dx_case_front, 0, 0]) {
+          case_snaps(
+            top=top,
+            left=true,
+            z=z_half,
+          );
+          case_snaps(
+            top=top,
+            left=false,
+            z=z_half,
+          );
+        }
+      }
     }
 
     // extra split clearance around hinge
@@ -239,13 +313,11 @@ render() {
   translate(v=[x / 2, y / 2, z_top / 2]) {
     if (render_case_bottom)
       translate(v=[0, 0, explode_case_bottom_z])
-        color(c="skyblue")
-          case_shell(top=false);
+        case(top=false);
 
     if (render_case_top)
       translate(v=[0, 0, explode_case_top_z])
-        color(c="lightsteelblue")
-          case_shell(top=true);
+        case(top=true);
   }
 
   if (render_tray) {
