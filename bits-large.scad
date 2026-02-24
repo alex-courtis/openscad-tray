@@ -190,7 +190,7 @@ module case_hinge_inner_cutout() {
   translate(v=[dx, -dy, dz]) {
     hull()
       rotate(a=90, v=[0, 0, -1])
-        case_hinge(inner=true, gap=0);
+        case_hinge(inner=true, gap=-(segs_hinge - 1) * g_hinge);
   }
 }
 
@@ -205,20 +205,34 @@ module case_shell(top) {
     : case_z * (split_ratio) - g_case_half / 2;
 
   difference() {
-    cube(outer, center=true);
-    cube(inner, center=true);
+    union() {
+      difference() {
 
-    translate(v=[0, 0, dz_half])
-      cube(outer, center=true);
+        // shell
+        cube(outer, center=true);
+        cube(inner, center=true);
 
-    translate(v=[case_x + dx_case_front, 0, 0])
-      cube(outer, center=true);
+        // split in half
+        translate(v=[0, 0, dz_half])
+          cube(outer, center=true);
 
-    if (!top)
-      case_hinge_inner_cutout();
+        // cut off front
+        translate(v=[case_x + dx_case_front, 0, 0])
+          cube(outer, center=true);
+
+        // cutouts for inner hinges
+        if (!top)
+          case_hinge_inner_cutout();
+      }
+
+      // hinges
+      case_hinges(top=top);
+    }
+
+    // extra split clearance around hinge
+    translate(v=[-case_x / 2 + t_case_x - offset_hinge, 0, dz_half + (top ? g_case_half : -g_case_half)])
+      cube([t_case_x * 2, case_y, case_z], center=true);
   }
-
-  case_hinges(top=top);
 }
 
 render() {
