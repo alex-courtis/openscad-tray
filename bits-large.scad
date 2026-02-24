@@ -264,17 +264,17 @@ module case_stops() {
       v=[
         -x / 2 + x_bottom + g_case_stop,
         -y / 2 + y * r,
-        z_top / 2 - z_case_stop + g_case_half,
+        z_top / 2 - z_case_stop + g_case_z,
       ]
     ) {
       rotate(a=90, v=[1, 0, 0])
         linear_extrude(h=y_case_stop, center=true) {
           polygon(
             [
-              [x_case_stop * 3 / 4, 0],
-              [x_case_stop / 4, 0],
-              [0, z_case_stop],
-              [x_case_stop, z_case_stop],
+              [x_case_stop * 0.8, 0],
+              [x_case_stop * 0.2, 0],
+              [0, z_case_stop + t_case_z],
+              [x_case_stop, z_case_stop + t_case_z],
             ]
           );
         }
