@@ -30,6 +30,7 @@ g_case_x = 0.2; // [0:0.1:5]
 g_case_y = 0.2; // [0:0.1:5]
 g_case_z = 0.2; // [0:0.1:5]
 g_case_half = 0.2; // [0:0.1:5]
+g_case_stop = 0; // [0:0.1:5]
 
 t_case_x = 2.4; // [0:0.1:5]
 t_case_y = 2.4; // [0:0.1:5]
@@ -38,6 +39,10 @@ t_case_z = 1.2; // [0:0.1:5]
 // length of a segment
 snap_len = 24; // [1:1:50]
 snap_diam = 6; // [1:0.1:50]
+
+x_case_stop = 6; // [1:0.1:20]
+y_case_stop = 2.4; // [1:0.1:20]
+z_case_stop = 8; // [1:0.1:20]
 
 /* [Tray] */
 
@@ -137,6 +142,13 @@ echo(case_z=case_z);
 
 dx_case_front = case_cutoff_dx < 1 ? case_cutoff_dx : -x_top / 4;
 echo(dx_case_front=dx_case_front);
+
+case_stop_ratios = let (
+  r = concat([0], rows, [1]),
+) [
+    for (i = [0:len(r) - 2]) r[i] + (r[i + 1] - r[i]) / 2,
+];
+echo(case_stop_ratios=case_stop_ratios);
 
 // manually cutoff arms as rounded arm bottoms do not print well
 module case_hinge(inner, gap = g_hinge) {
@@ -246,6 +258,30 @@ module case_snaps(top, left, z) {
     );
 }
 
+module case_stops() {
+  for (r = case_stop_ratios) {
+    translate(
+      v=[
+        -x / 2 + x_bottom + g_case_stop,
+        -y / 2 + y * r,
+        z_top / 2 - z_case_stop + g_case_half,
+      ]
+    ) {
+      rotate(a=90, v=[1, 0, 0])
+        linear_extrude(h=y_case_stop, center=true) {
+          polygon(
+            [
+              [x_case_stop * 3 / 4, 0],
+              [x_case_stop / 4, 0],
+              [0, z_case_stop],
+              [x_case_stop, z_case_stop],
+            ]
+          );
+        }
+    }
+  }
+}
+
 // half shell with front chopped off
 module case(top) {
   outer = [case_x, case_y, case_z];
@@ -301,6 +337,10 @@ module case(top) {
           );
         }
       }
+
+      if (top)
+        color(c="paleturquoise")
+          case_stops();
     }
 
     // extra split clearance around hinge
