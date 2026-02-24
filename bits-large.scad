@@ -34,11 +34,12 @@ g_case_stop = 0; // [0:0.1:5]
 
 t_case_x = 2.4; // [0:0.1:5]
 t_case_y = 2.4; // [0:0.1:5]
-t_case_z = 1.2; // [0:0.1:5]
+t_case_z = 2.4; // [0:0.1:5]
 
 // length of a segment
 snap_len = 24; // [1:1:50]
 snap_diam = 6; // [1:0.1:50]
+g_snap = 0.2; // [0:0.1:5]
 
 x_case_stop = 6; // [1:0.1:20]
 y_case_stop = 2.4; // [1:0.1:20]
@@ -242,7 +243,7 @@ module case_snaps(top, left, z) {
     snap_lock(
       snapdiam=snap_diam,
       thick=snap_thick,
-      snaplen=snap_len,
+      snaplen=snap_len - g_snap,
       layerheight=0,
       anchor=top ? FRONT : BACK,
       orient=UP,
