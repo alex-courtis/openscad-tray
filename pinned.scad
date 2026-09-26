@@ -1,28 +1,26 @@
+include <BOSL2/std.scad>
 include <tray.scad>
 include <util.scad>
 
 d_filament = 0.6;
 z_layer = 0.3;
 
-// y = 162.5;
-// x = 255;
-// z = 16;
-y = 60;
-x = 30;
-z = 16;
+x = 162.5;
+y = 255;
+z = 20;
 
 t_outer = 1.8;
 t_inner = 1.8;
 t_bottom = 0.9;
 
-d_pin = 2.15;
+d_pin = 2.25;
 l_pin = 12;
 l_pin_out = 6;
 l_pin_clearance = 0.6;
 
 pin_inset = d_pin * 0.5 + d_filament * 2;
 
-slot_clearance = 0.3;
+slot_clearance = 0.4;
 
 bottom_thickness = derive_bottom_thickness(bottom_thickness_desired=t_bottom, thickness=t_outer, dividers_thickness=t_inner) + 0.001;
 echo(bottom_thickness=bottom_thickness);
@@ -60,25 +58,20 @@ module pinned_corners() {
   }
 }
 
-module body() {
+render() {
   pinned_corners()
     tray(
       dimensions=[x, y, z],
-      // n_columns=2,
-      // n_rows=[2, 1],
-      // columns=[0.25, 0.75],
+      n_columns=3,
+      n_rows=[2, 3, 1],
+      columns=[0.2, 0.6],
+      rows=[[0.25], [0.7, 0.2], false],
       thickness=t_outer,
       bottom_thickness=bottom_thickness,
       dividers_thickness=is_undef(t_inner) ? undef : t_inner,
       dividers_top_bevel_radius=t_inner / 2,
       dividers_bottom_bevel_radius=t_inner / 2,
       rows_first=false,
+      curved=false,
     );
-}
-
-render() {
-  body();
-
-  translate(v=[0, 0, z])
-    body();
 }
