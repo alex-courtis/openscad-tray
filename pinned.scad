@@ -1,7 +1,8 @@
 include <tray.scad>
 include <util.scad>
 
-// print at 0.6, 0.30
+d_filament = 0.6;
+z_layer = 0.3;
 
 // y = 162.5;
 // x = 255;
@@ -14,22 +15,53 @@ t_outer = 1.8;
 t_inner = 1.8;
 t_bottom = 0.9;
 
-d_pin = 3.05;
-l_pin = 15;
-l_pin_out = 3;
+d_pin = 2.15;
+l_pin = 12;
+l_pin_out = 6;
+l_pin_clearance = 0.6;
 
-dx_pin = d_pin * 0.75;
-dy_pin = d_pin * 0.75;
+pin_inset = d_pin * 0.5 + d_filament * 2;
 
-r_top_bevel = 7.0;
+slot_clearance = 0.3;
 
 bottom_thickness = derive_bottom_thickness(bottom_thickness_desired=t_bottom, thickness=t_outer, dividers_thickness=t_inner) + 0.001;
 echo(bottom_thickness=bottom_thickness);
 
 $fn = 200;
 
-render()
+module pinned_corners() {
+  xy_corner = sqrt(pin_inset ^ 2 * 2) + d_pin / 2 + d_filament * 2;
+  xy_slot = sqrt(pin_inset ^ 2 * 2) + d_pin / 2 + slot_clearance;
+
+  module corner(xy) {
+    intersection() {
+      cube(size=[x, y, z]);
+      for (x = [0, x], y = [0, y])
+        translate(v=[x, y, z / 2])
+          rotate(a=45)
+            cube(size=[2 * xy, 2 * xy, z], center=true);
+    }
+  }
+
   difference() {
+    union() {
+      children();
+      corner(xy=xy_corner);
+    }
+
+    translate(v=[0, 0, -z + l_pin_out + l_pin_clearance])
+      corner(xy=xy_slot);
+
+    translate(v=[0, 0, l_pin / 2 + z - l_pin + l_pin_out]) {
+      for (x = [pin_inset, x - pin_inset], y = [pin_inset, y - pin_inset])
+        translate(v=[x, y, 0])
+          #cylinder(d=d_pin, h=l_pin, center=true);
+    }
+  }
+}
+
+module body() {
+  pinned_corners()
     tray(
       dimensions=[x, y, z],
       // n_columns=2,
@@ -38,22 +70,15 @@ render()
       thickness=t_outer,
       bottom_thickness=bottom_thickness,
       dividers_thickness=is_undef(t_inner) ? undef : t_inner,
-      top_bevel_radius=r_top_bevel,
-      // bottom_bevel_radius=0,
-      dividers_top_bevel_radius=t_inner/2,
-      dividers_bottom_bevel_radius=t_inner/2,
+      dividers_top_bevel_radius=t_inner / 2,
+      dividers_bottom_bevel_radius=t_inner / 2,
       rows_first=false,
     );
+}
 
-    translate(v=[0, 0, l_pin / 2 + z - l_pin + l_pin_out]) {
-      for (x = [dx_pin, x - dx_pin], y = [dy_pin, y - dy_pin])
-        translate(v=[x, y, 0]) {
-          cylinder(d=d_pin, h=l_pin, center=true);
-        }
-    }
+render() {
+  body();
 
-    for (x = [0, x], y = [0, y])
-      translate(v=[x, y, 0])
-        rotate(a=45)
-          cube(size=[(d_pin + dx_pin) * 2, (d_pin + dy_pin) * 2, l_pin_out], center=true);
-  }
+  translate(v=[0, 0, z])
+    body();
+}
