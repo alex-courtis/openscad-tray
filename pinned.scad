@@ -9,6 +9,16 @@ x = 162.5;
 y = 255;
 z = 20;
 
+// n_columns = 3;
+// n_rows = [2, 3, 1];
+// columns = [0.2, 0.6];
+// rows = [[0.25], [0.7, 0.2], false];
+
+n_columns = 3;
+n_rows = [1, 2, 2];
+columns = [0.2, 0.575];
+rows = [false, [0.6], [0.35]];
+
 t_outer = 1.8;
 t_inner = 1.8;
 t_bottom = 1.2;
@@ -62,10 +72,10 @@ render() {
   pinned_corners()
     tray(
       dimensions=[x, y, z],
-      n_columns=3,
-      n_rows=[2, 3, 1],
-      columns=[0.2, 0.6],
-      rows=[[0.25], [0.7, 0.2], false],
+      n_columns=n_columns,
+      n_rows=n_rows,
+      columns=columns,
+      rows=rows,
       thickness=t_outer,
       bottom_thickness=bottom_thickness,
       dividers_thickness=is_undef(t_inner) ? undef : t_inner,
