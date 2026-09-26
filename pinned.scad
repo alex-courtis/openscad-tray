@@ -11,7 +11,7 @@ z = 20;
 
 t_outer = 1.8;
 t_inner = 1.8;
-t_bottom = 0.9;
+t_bottom = 1.2;
 
 d_pin = 2.25;
 l_pin = 12;
@@ -28,7 +28,7 @@ echo(bottom_thickness=bottom_thickness);
 $fn = 200;
 
 module pinned_corners() {
-  xy_corner = sqrt(pin_inset ^ 2 * 2) + d_pin / 2 + d_filament * 2;
+  xy_corner = sqrt(pin_inset ^ 2 * 2) + d_pin / 2 + slot_clearance + d_filament * 2;
   xy_slot = sqrt(pin_inset ^ 2 * 2) + d_pin / 2 + slot_clearance;
 
   module corner(xy) {
