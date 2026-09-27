@@ -43,13 +43,24 @@ z_layer = 0.3;
 // t_bottom = 1.5;
 
 // from spanner-allen.scad
-x = 255;
-y = 162.5;
+// x = 255;
+// y = 162.5;
+// z = 20;
+// n_columns = 6;
+// columns = [0.459459, 0.58816, 0.67396, 0.77692, 0.88846, 1];
+// n_rows = [6, 1, 1, 1, 1, 1];
+// rows = [[0.146667, 0.293333, 0.46, 0.626667, 0.813333, 1], false, false, false, false, false];
+// t_outer = 1.8;
+// t_inner = 1.8;
+// t_bottom = 1.2;
+
+x = 162.5;
+y = 255;
 z = 20;
-n_columns = 6;
-columns = [0.459459, 0.58816, 0.67396, 0.77692, 0.88846, 1];
-n_rows = [6, 1, 1, 1, 1, 1];
-rows = [[0.146667, 0.293333, 0.46, 0.626667, 0.813333, 1], false, false, false, false, false];
+n_columns = 3;
+n_rows = [2, 2, 3];
+columns = [0.3, 0.8];
+rows = [[0.475], [0.85], [0.25, 0.75],];
 t_outer = 1.8;
 t_inner = 1.8;
 t_bottom = 1.2;
