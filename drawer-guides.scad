@@ -2,7 +2,7 @@ include <BOSL2/std.scad>
 
 size = [267, 9.5, 53];
 top = 3;
-ribs = 3;
+ribs = 2;
 
 t_top = 1.8;
 t_bottom = 1.8;
