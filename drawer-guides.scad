@@ -1,12 +1,12 @@
 include <BOSL2/std.scad>
 
-size = [267, 9.5, 53];
-top = 3;
-ribs = 2;
+size = [269, 10.5, 55];
+top = 1.8;
+ribs = 4;
 
 t_top = 1.8;
 t_bottom = 1.8;
-t_wall = 0.9;
+t_wall = 1.2;
 t_rib = 1.8;
 
 chamfer = 1.8;
