@@ -13,17 +13,17 @@ include <BOSL2/std.scad>
 // chamfer = 1.8;
 
 // bottom back, fits between sides
-size = [(566 - 10.5 * 2) / 2 - 3, 7, 65];
+size = [273, 7, 63];
 top = 7;
-ribs = 3;
+ribs = 4;
 tape = 6;
 
 t_top = 1.8;
 t_bottom = 1.8;
-t_wall = 1.2;
+t_wall = 0.9;
 t_rib = 1.8;
 
-chamfer = 1.8;
+chamfer = 1.2;
 
 d_hole = 2.0;
 
