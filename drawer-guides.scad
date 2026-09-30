@@ -1,8 +1,22 @@
 include <BOSL2/std.scad>
 
-size = [269, 10.5, 55];
-top = 1.8;
-ribs = 4;
+// bottom sides
+// size = [269, 10.5, 55];
+// top = 1.8;
+// ribs = 4;
+//
+// t_top = 1.8;
+// t_bottom = 1.8;
+// t_wall = 1.2;
+// t_rib = 1.8;
+//
+// chamfer = 1.8;
+
+// bottom back, fits between sides
+size = [(566 - 10.5 * 2) / 2 - 3, 7, 55];
+top = 6;
+ribs = 3;
+tape = 6;
 
 t_top = 1.8;
 t_bottom = 1.8;
@@ -10,6 +24,8 @@ t_wall = 1.2;
 t_rib = 1.8;
 
 chamfer = 1.8;
+
+d_hole = 2.1;
 
 a = 90 - atan(size.z / (size.y - top));
 
@@ -48,9 +64,11 @@ module divider() {
   }
 
   module hollow() {
+    dz = -t_top - t_bottom - (is_undef(tape) ? 0 : tape);
+
     intersection() {
       translate(v=[0, 0, t_bottom])
-        cube(size=size - [0, 0, t_top + t_bottom], center=false);
+        cube(size=size + [0, 0, dz], center=false);
 
       translate(v=[0, -t_wall / cos(a), 0])
         rotate(a=90, v=[0, 1, 0])
@@ -59,12 +77,30 @@ module divider() {
     }
   }
 
+  module holes() {
+    for (
+      x = [t_rib / 2, size.x - t_rib / 2],
+      z = [
+        t_bottom + d_hole / 2 + d_hole,
+        size.z / 2 - (is_undef(tape) ? 0 : tape) / 2,
+        size.z - t_top - d_hole / 2 - d_hole - (is_undef(tape) ? 0 : tape),
+      ]
+    )
+      translate(v=[x, d_hole, z])
+        rotate(a=90, v=[0, 0, 1])
+          teardrop(h=t_rib, d=d_hole, ang=60, orient=LEFT);
+  }
+
   difference() {
     whole();
 
     for (dx = [t_rib:x_hollow + t_rib:size.x - t_rib]) {
       translate(v=[dx, 0, 0])
         hollow();
+    }
+
+    if (!is_undef(d_hole)) {
+      holes();
     }
   }
 }
