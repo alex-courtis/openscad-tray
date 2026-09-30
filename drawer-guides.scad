@@ -86,7 +86,7 @@ module divider() {
         size.z - t_top - d_hole / 2 - d_hole - (is_undef(tape) ? 0 : tape),
       ]
     )
-      translate(v=[x, d_hole, z])
+      translate(v=[x, top / 2, z])
         rotate(a=90, v=[0, 0, 1])
           teardrop(h=t_rib, d=d_hole, ang=60, orient=LEFT);
   }
