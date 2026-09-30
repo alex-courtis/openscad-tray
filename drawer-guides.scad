@@ -13,8 +13,23 @@ include <BOSL2/std.scad>
 // chamfer = 1.8;
 
 // bottom back, fits between sides
-size = [273, 7, 63];
-top = 7;
+// size = [273, 7, 63];
+// top = 7;
+// ribs = 4;
+// tape = 6;
+//
+// t_top = 1.8;
+// t_bottom = 1.8;
+// t_wall = 0.9;
+// t_rib = 1.8;
+//
+// chamfer = 1.2;
+//
+// d_hole = 2.0;
+
+// bottom front, fits between sides
+size = [273, 8, 60];
+top = 0.6;
 ribs = 4;
 tape = 6;
 
@@ -23,7 +38,7 @@ t_bottom = 1.8;
 t_wall = 0.9;
 t_rib = 1.8;
 
-chamfer = 1.2;
+chamfer = 0.3;
 
 d_hole = 2.0;
 
@@ -80,15 +95,24 @@ module divider() {
   module holes() {
     for (
       x = [t_rib / 2, size.x - t_rib / 2],
+      // z = [
+      //   t_bottom + d_hole / 2 + d_hole,
+      //   size.z / 2 - (is_undef(tape) ? 0 : tape) / 2,
+      //   size.z - t_top - d_hole / 2 - d_hole - (is_undef(tape) ? 0 : tape),
+      // ],
+
+      // TODO bottom front only
       z = [
         t_bottom + d_hole / 2 + d_hole,
-        size.z / 2 - (is_undef(tape) ? 0 : tape) / 2,
-        size.z - t_top - d_hole / 2 - d_hole - (is_undef(tape) ? 0 : tape),
-      ]
+        size.z / 2,
+      ],
     )
-      translate(v=[x, top / 2, z])
-        rotate(a=90, v=[0, 0, 1])
-          teardrop(h=t_rib, d=d_hole, ang=60, orient=LEFT);
+    // translate(v=[x, top / 2, z])
+
+    // TODO bottom front only
+    translate(v=[x, (top + size.y) / 4, z])
+      rotate(a=90, v=[0, 0, 1])
+        teardrop(h=t_rib + 0.0001, d=d_hole, ang=60, orient=LEFT);
   }
 
   difference() {
