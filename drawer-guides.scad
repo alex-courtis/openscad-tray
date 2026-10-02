@@ -42,10 +42,37 @@ include <BOSL2/std.scad>
 //
 // d_hole = 2.0;
 
-// top sides
-size = [269, 3, 35];
-top = 3;
-ribs = 3;
+// // top sides
+// size = [269, 3, 35];
+// top = 3;
+// ribs = 3;
+// tape = 6;
+//
+// t_top = 1.8;
+// t_bottom = 1.8;
+// t_wall = 1.2;
+// t_rib = 1.8;
+//
+// chamfer = 1.5;
+
+// top front, fits between sides
+// size = [162.5, 8, 40];
+// top = 1.25;
+// ribs = 2;
+// tape = 6;
+//
+// t_top = 1.8;
+// t_bottom = 1.8;
+// t_wall = 1.2;
+// t_rib = 1.8;
+//
+// chamfer = 1;
+
+
+// top back, fits between sides
+size = [162.5, 6, 41];
+top = 5;
+ribs = 2;
 tape = 6;
 
 t_top = 1.8;
