@@ -28,21 +28,38 @@ include <BOSL2/std.scad>
 // d_hole = 2.0;
 
 // bottom front, fits between sides
-size = [273, 8, 60];
-top = 0.6;
-ribs = 4;
+// size = [273, 8, 60];
+// top = 0.6;
+// ribs = 4;
+// tape = 6;
+//
+// t_top = 1.8;
+// t_bottom = 1.8;
+// t_wall = 0.9;
+// t_rib = 1.8;
+//
+// chamfer = 0.3;
+//
+// d_hole = 2.0;
+
+// top sides
+size = [269, 3, 35];
+top = 3;
+ribs = 3;
 tape = 6;
 
 t_top = 1.8;
 t_bottom = 1.8;
-t_wall = 0.9;
+t_wall = 1.2;
 t_rib = 1.8;
 
-chamfer = 0.3;
+chamfer = 1.5;
 
-d_hole = 2.0;
+echo(size=size);
 
 a = 90 - atan(size.z / (size.y - top));
+
+echo(a=a);
 
 poly_cross = [
   [0, 0],
